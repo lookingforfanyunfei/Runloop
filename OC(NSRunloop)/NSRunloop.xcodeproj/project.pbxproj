@@ -518,6 +518,7 @@
 				0F13C9B61F7F3FE300AC72EC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		0F13C9B71F7F3FE300AC72EC /* Build configuration list for PBXNativeTarget "NSRunloopTests" */ = {
 			isa = XCConfigurationList;
@@ -526,6 +527,7 @@
 				0F13C9B91F7F3FE300AC72EC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		0F13C9BA1F7F3FE300AC72EC /* Build configuration list for PBXNativeTarget "NSRunloopUITests" */ = {
 			isa = XCConfigurationList;
@@ -534,6 +536,7 @@
 				0F13C9BC1F7F3FE300AC72EC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
