@@ -8,75 +8,59 @@
 
 #import "ViewController.h"
 
-@interface ViewController ()
+#import "PerformSelectorViewController.h"
+#import "TimerViewController.h"
+#import "PortViewController.h"
 
-@property(nonatomic,strong) NSThread *myThread;
-@property(nonatomic,assign) BOOL runLoopThreadDidFinishFlag;
-@property(nonatomic,strong) dispatch_source_t timer;
+@interface ViewController () <UITableViewDelegate, UITableViewDataSource>
+
+@property(nonatomic,strong) UITableView *tableView;
+@property(nonatomic,strong) NSArray *titles;
+
 @end
 
 @implementation ViewController
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
-    [self runLoopAddDependance];
+    self.navigationItem.title = @"runloop应用场景";
+    self.view.backgroundColor = [UIColor whiteColor];
+    
+    _titles = @[@"PeformSelector",@"Timer",@"Port"];
+    
+    _tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+    _tableView.delegate = self;
+    _tableView.dataSource = self;
+    _tableView.tableFooterView = [UIView new];
+    [_tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"UITableViewCell"];
+    [self.view addSubview:_tableView];
     
 }
 
-- (void)runLoopAddDependance
-{
-    self.runLoopThreadDidFinishFlag = NO;
-    NSLog(@"Start a New Run Loop Thread");
-    NSThread *runLoopThread = [[NSThread alloc] initWithTarget:self selector:@selector(handleRunLoopThreadTask) object:nil];
-    [runLoopThread start];
-    
-    NSLog(@"Exit handleRunLoopThreadButtonTouchUpInside");
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        while (!_runLoopThreadDidFinishFlag) {
-            self.myThread = [NSThread currentThread];
-            NSLog(@"Begin RunLoop");
-            NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
-            NSPort *myPort = [NSPort port];
-            [runLoop addPort:myPort forMode:NSDefaultRunLoopMode];
-            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
-            NSLog(@"End RunLoop");
-            [self.myThread cancel];
-            self.myThread = nil;
-        }
-    });
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"***********%@*********",@"完成");
-    });
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return _titles.count;
 }
 
-- (void)handleRunLoopThreadTask
-{
-    NSLog(@"Enter Run Loop Thread");
-    for (NSInteger i = 0; i < 10; i ++) {
-        NSLog(@"In Run Loop Thread, count = %ld", i);
-        sleep(1);
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"UITableViewCell" forIndexPath:indexPath];
+    cell.textLabel.text = _titles[indexPath.row];
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.row == 0) {
+        PerformSelectorViewController *performSelectorVC = [[PerformSelectorViewController alloc] init];
+        [self.navigationController pushViewController:performSelectorVC animated:YES];
+    } else if (indexPath.row == 1) {
+        TimerViewController *timerVC = [[TimerViewController alloc] init];
+        [self.navigationController pushViewController:timerVC animated:YES];
+    } else if (indexPath.row == 2) {
+        PortViewController *portVC = [[PortViewController alloc] init];
+        [self.navigationController pushViewController:portVC animated:YES];
     }
-#if 0
-    // 错误示范
-    _runLoopThreadDidFinishFlag = YES;
-    // 这个时候并不能执行线程完成之后的任务，因为Run Loop所在的线程并不知道runLoopThreadDidFinishFlag被重新赋值。Run Loop这个时候没有被任务事件源唤醒。
-    // 正确的做法是使用 "selector"方法唤醒Run Loop。 即如下:
-#endif
-    NSLog(@"Exit Normal Thread");
-    [self performSelector:@selector(tryOnMyThread) onThread:self.myThread withObject:nil waitUntilDone:NO];
-    
-    NSLog(@"Exit Run Loop Thread");
 }
 
-- (void)tryOnMyThread
-{
-    _runLoopThreadDidFinishFlag = YES;
-}
-
-- (void)didReceiveMemoryWarning
-{
+- (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
 }
 
