@@ -42,14 +42,15 @@
             NSPort *myPort = [NSPort port];
             [runLoop addPort:myPort forMode:NSDefaultRunLoopMode];
             [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+            
+            
             NSLog(@"End RunLoop");
             [self.myThread cancel];
             self.myThread = nil;
         }
-    });
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"***********%@*********",@"完成");
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@"***********%@*********",@"完成");
+        });
     });
 }
 
@@ -66,6 +67,7 @@
     // 这个时候并不能执行线程完成之后的任务，因为Run Loop所在的线程并不知道runLoopThreadDidFinishFlag被重新赋值。Run Loop这个时候没有被任务事件源唤醒。
     // 正确的做法是使用 "selector"方法唤醒Run Loop。 即如下:
 #endif
+    
     NSLog(@"Exit Normal Thread");
     [self performSelector:@selector(tryOnMyThread) onThread:self.myThread withObject:nil waitUntilDone:NO];
     

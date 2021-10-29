@@ -14,7 +14,7 @@
 @property (nonatomic,strong) NSArray <NSString *>*dataArray;
 
 @property (nonatomic,strong) NSTimer * timer;
-@property (nonatomic, strong) NSThread *thread;
+@property (nonatomic, strong) NSThread *myThread;
 
 @end
 
@@ -40,14 +40,14 @@
     [_tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"UITableViewCell"];
     [self.view addSubview:_tableView];
     
-    [self startTimerOnMainThread];
+//    [self startTimerOnMainThread];
     
-//    [self startTimerOnChildThread];
+    [self startTimerOnChildThread];
 }
 
 - (void)cancelTimer {
-    if (self.timer && self.thread) {
-        [self performSelector:@selector(cancel) onThread:self.thread withObject:nil waitUntilDone:YES];
+    if (self.timer && self.myThread) {
+        [self performSelector:@selector(cancel) onThread:self.myThread withObject:nil waitUntilDone:NO];
     }
 }
 
@@ -56,16 +56,32 @@
         [_timer invalidate];
         _timer = nil;
     }
+    
+    // 停止RunLoop
+    CFRunLoopStop(CFRunLoopGetCurrent());
+    
+    [self.myThread cancel];
+    self.myThread = nil;
 }
 
 - (void)startTimerOnChildThread {
+    
+//    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+//        _thread = [NSThread currentThread];
+//        _timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(testTimer) userInfo:nil repeats:YES];
+//
+//        NSRunLoop *runloop = [NSRunLoop currentRunLoop];
+//        [runloop addTimer:_timer forMode:NSDefaultRunLoopMode];
+//        [runloop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+//    });
+    
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        _thread = [NSThread currentThread];
-        _timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(testTimer) userInfo:nil repeats:YES];
+        self.myThread = [NSThread currentThread];
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(testTimer) userInfo:nil repeats:YES];
         
         NSRunLoop *runloop = [NSRunLoop currentRunLoop];
-        [runloop addTimer:_timer forMode:NSDefaultRunLoopMode];
-        [runloop run];
+        [runloop addTimer:self.timer forMode:NSDefaultRunLoopMode];
+        [runloop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
     });
 }
 
@@ -79,7 +95,7 @@
     
     if (!_timer) {
         _timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(testTimer) userInfo:nil repeats:YES];
-        _thread = [NSThread currentThread];
+        _myThread = [NSThread currentThread];
     }
     [[NSRunLoop mainRunLoop] addTimer:_timer forMode:NSRunLoopCommonModes];
 }
