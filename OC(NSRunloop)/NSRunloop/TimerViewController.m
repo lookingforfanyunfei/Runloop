@@ -40,9 +40,9 @@
     [_tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"UITableViewCell"];
     [self.view addSubview:_tableView];
     
-//    [self startTimerOnMainThread];
+    [self startTimerOnMainThread];
     
-    [self startTimerOnChildThread];
+//    [self startTimerOnChildThread];
 }
 
 - (void)cancelTimer {
@@ -67,7 +67,7 @@
 - (void)startTimerOnChildThread {
     
 //    dispatch_async(dispatch_get_global_queue(0, 0), ^{
-//        _thread = [NSThread currentThread];
+//        _myThread = [NSThread currentThread];
 //        _timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(testTimer) userInfo:nil repeats:YES];
 //
 //        NSRunLoop *runloop = [NSRunLoop currentRunLoop];
@@ -88,7 +88,7 @@
 - (void)startTimerOnMainThread {
 //    if (!_timer) {
 //        _timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(testTimer) userInfo:nil repeats:YES];
-//    _thread = [NSThread currentThread];
+//    _myThread = [NSThread currentThread];
 //    }
 //    [_timer fire];
     
