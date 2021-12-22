@@ -14,7 +14,7 @@
 @property (nonatomic,strong) NSArray <NSString *>*dataArray;
 
 @property (nonatomic,strong) NSTimer * timer;
-@property (nonatomic, strong) NSThread *myThread;
+@property (atomic, strong) NSThread *myThread;
 
 @end
 
@@ -43,6 +43,18 @@
     [self startTimerOnMainThread];
     
 //    [self startTimerOnChildThread];
+    
+//    [self customMode];
+}
+
+- (void)customMode {
+    /// 这里使用非主线程，主要考虑如果一直处于customMode模式，则主线瘫痪
+    dispatch_async(dispatch_get_global_queue(0, DISPATCH_QUEUE_PRIORITY_DEFAULT), ^{
+        self.myThread = [NSThread currentThread];
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(testTimer) userInfo:nil repeats:YES];
+        [[NSRunLoop currentRunLoop] addTimer:_timer forMode:@"customMode"];
+        [[NSRunLoop currentRunLoop] runMode:@"customMode" beforeDate:[NSDate distantFuture]];
+    });
 }
 
 - (void)cancelTimer {
@@ -66,7 +78,7 @@
 
 - (void)startTimerOnChildThread {
     
-//    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+//    dispatch_async(dispatch_get_global_queue(0, DISPATCH_QUEUE_PRIORITY_DEFAULT), ^{
 //        _myThread = [NSThread currentThread];
 //        _timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(testTimer) userInfo:nil repeats:YES];
 //
@@ -75,7 +87,7 @@
 //        [runloop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
 //    });
     
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+    dispatch_async(dispatch_get_global_queue(0, DISPATCH_QUEUE_PRIORITY_DEFAULT), ^{
         self.myThread = [NSThread currentThread];
         self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(testTimer) userInfo:nil repeats:YES];
         
