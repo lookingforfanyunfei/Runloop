@@ -44,10 +44,20 @@
     
 //    [self startTimerOnChildThread];
     
-    [self customMode];
+//    [self customModeTest];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        [self performSelector:@selector(backGroundThread) onThread:[NSThread currentThread] withObject:nil waitUntilDone:NO];
+        NSLog(@"hello world 1");
+    });
 }
 
-- (void)customMode {
+- (void)backGroundThread{
+    NSLog(@"—hello world2—");
+}
+
+- (void)customModeTest {
     /// 这里使用非主线程，主要考虑如果一直处于customMode模式，则主线瘫痪
     dispatch_async(dispatch_get_global_queue(0, DISPATCH_QUEUE_PRIORITY_DEFAULT), ^{
         self.myThread = [NSThread currentThread];

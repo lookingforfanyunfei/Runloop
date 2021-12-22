@@ -66,7 +66,7 @@ class ViewController: UIViewController
         print("Exit Run Loop Thread")
     }
     
-    func tryOnMyThread() {
+    @objc func tryOnMyThread() {
         self.runLoopThreadDidFinishFlag = true
     }
 }
