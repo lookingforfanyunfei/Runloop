@@ -40,11 +40,11 @@
     [_tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"UITableViewCell"];
     [self.view addSubview:_tableView];
     
-    [self startTimerOnMainThread];
+//    [self startTimerOnMainThread];
     
 //    [self startTimerOnChildThread];
     
-//    [self customMode];
+    [self customMode];
 }
 
 - (void)customMode {
@@ -52,8 +52,13 @@
     dispatch_async(dispatch_get_global_queue(0, DISPATCH_QUEUE_PRIORITY_DEFAULT), ^{
         self.myThread = [NSThread currentThread];
         self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(testTimer) userInfo:nil repeats:YES];
-        [[NSRunLoop currentRunLoop] addTimer:_timer forMode:@"customMode"];
-        [[NSRunLoop currentRunLoop] runMode:@"customMode" beforeDate:[NSDate distantFuture]];
+        
+        //必须注册自定义的mode,如果不注册自定义mode, 无法在当前子线程取消定时器
+        CFStringRef mode = (__bridge CFStringRef)(@"customMode");
+        CFRunLoopAddCommonMode(CFRunLoopGetCurrent(), mode);
+        
+        [[NSRunLoop currentRunLoop] addTimer:_timer forMode:CFBridgingRelease(mode)];
+        [[NSRunLoop currentRunLoop] runMode:CFBridgingRelease(mode) beforeDate:[NSDate distantFuture]];
     });
 }
 
