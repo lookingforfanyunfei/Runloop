@@ -44,17 +44,8 @@
     
 //    [self startTimerOnChildThread];
     
-//    [self customModeTest];
-    
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        
-        [self performSelector:@selector(backGroundThread) onThread:[NSThread currentThread] withObject:nil waitUntilDone:NO];
-        NSLog(@"hello world 1");
-    });
-}
+    [self customModeTest];
 
-- (void)backGroundThread{
-    NSLog(@"—hello world2—");
 }
 
 - (void)customModeTest {
